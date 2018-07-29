@@ -20,25 +20,24 @@ async def on_message(message):
         await client.send_message(message.channel, reply)
 
     elif message.content.startswith('/1'):
-        target = [['東京都内', '13'], ['千葉北西部','12'], ['熊本地方','43'], ['京都南部','26'],['宮城西部','04']]
-        for a,i in enumerate(target):
-            w = Weather(0,a,i[1],i[0])
+        for i in range(5):
+            w = Weather(0,i)
             reply = w.run()
             await client.send_message(message.channel, reply)
 
     elif message.content.startswith('/2'):
-        target = [['東京都内', '13'], ['千葉北西部','12'], ['熊本地方','43'], ['京都南部','26'],['宮城西部','04']]
-        for a,i in enumerate(target):
-            w = Weather(1,a,i[1],i[0])
+        for i in range(5):
+            w = Weather(1,i)
             reply = w.run()
             await client.send_message(message.channel, reply)
 
 class Weather:
-    def __init__(self, flag, todo, code, area):
+    def __init__(self, flag, todo):
         self.flag = flag
         self.todo = todo
-        self.code = code
-        self.area = area
+        self.target = [['東京都内', '13'], ['千葉北西部','12'], ['熊本地方','43'], ['京都南部','26'],['宮城西部','04']]
+        self.code = self.target[self.todo][1]
+        self.area= self.target[self.todo][0]
 
     def get_json(self):
         url = 'http://www.drk7.jp/weather/json/' + self.code + '.js'
@@ -71,7 +70,6 @@ class Weather:
     def run(self):
         m = self.make_text()
         return m
-
 
 
 
