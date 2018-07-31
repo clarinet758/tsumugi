@@ -36,8 +36,8 @@ async def on_message(message):
         if t[0] == 'error':
             reply = 'にゃーん'
         else:
-            tmp = "{0:}線の運行情報は{1:}に更新されていて、{2:}"
-            reply = tmp.format("東西",t[0],t[1])
+            tmp = "{0:}線の{1:}の時点の運行情報は{2:}に更新されていて、{3:}"
+            reply = tmp.format("東西",t[0],t[1],t[2])
         await client.send_message(message.channel, reply)
             
 
@@ -52,7 +52,8 @@ def metro():
     for i in d:
         if i["odpt:railway"] == "odpt.Railway:TokyoMetro.Tozai":
         #if i["odpt:railway"] == "odpt.Railway:TokyoMetro.Chiyoda":
-            ans.append(i["odpt:timeOfOrigin"])
+            ans.append(i["dc:date"].replace("+09:00",""))
+            ans.append(i["odpt:timeOfOrigin"].replace("+09:00",""))
             ans.append(i["odpt:trainInformationText"])
             return ans
     return ("error",)
