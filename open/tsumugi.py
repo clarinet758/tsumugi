@@ -31,6 +31,33 @@ async def on_message(message):
             reply = w.run()
             await client.send_message(message.channel, reply)
 
+    elif message.content.startswith('/8'):
+        t = metro()
+        if t[0] == 'error':
+            reply = 'にゃーん'
+        else:
+            tmp = "{0:}線の運行情報は{1:}に更新されていて、{2:}"
+            reply = tmp.format("東西",t[0],t[1])
+        await client.send_message(message.channel, reply)
+            
+
+def metro():
+    ans=[]
+    u = "https://api.tokyometroapp.jp/api/v2/datapoints?rdf:type=odpt:TrainInformation&acl:consumerKey="
+    t = settings.met
+    a = urllib.request.urlopen(u+t)
+    b = a.read()
+    c = b.decode('utf_8')
+    d = json.loads(c)
+    for i in d:
+        if i["odpt:railway"] == "odpt.Railway:TokyoMetro.Tozai":
+        #if i["odpt:railway"] == "odpt.Railway:TokyoMetro.Chiyoda":
+            ans.append(i["odpt:timeOfOrigin"])
+            ans.append(i["odpt:trainInformationText"])
+            return ans
+    return ("error",)
+    
+
 class Weather:
     def __init__(self, flag, todo):
         self.flag = flag
