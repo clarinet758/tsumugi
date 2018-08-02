@@ -1,5 +1,6 @@
 import discord # install[pip3 install discord.py]
 import settings #
+import asyncio
 import datetime
 import urllib.request, urllib.error
 import json
@@ -99,8 +100,40 @@ class Weather:
         m = self.make_text()
         return m
 
+async def my_background_task():
+    await client.wait_until_ready()
+    counter = 0
+    channel = discord.Object(id=settings.ani)
+    while not client.is_closed:
+        t = datetime.datetime.now()
+        u = "http://www.nowshika.com/joso/dummy.json"
+        a = urllib.request.urlopen(u)
+        b = a.read()
+        c = b.decode('utf_8')
+        d = json.loads(c)
+        if t.hour == 0 and t.minute<15:
+            res = []
+            l   = d["anime"]
+            for i in l:
+                if i["w"] == t.weekday():
+                    res.append(i["title"])
+            if len(res) == 0:
+                m = "今日のチェックする放送はありません"
+            else:
+                x = ", ".join(res)
+                m = "今日のチェックする放送は" + x
+            await client.send_message(channel, m)
+        elif t.hour%4==0 and t.minute<0:
+            a="定期更新"
+            await client.send_message(channel, a)
+        #else:
+        #    a="10分更新"
+        #    await client.send_message(channel, a)
+        await asyncio.sleep(900) # task runs every 60 seconds
+
 
 
 # botの接続と起動
 # （tokenにはbotアカウントのアクセストークンを入れてください）
+client.loop.create_task(my_background_task())
 client.run(settings.tkn)
