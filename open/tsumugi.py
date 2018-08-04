@@ -4,9 +4,11 @@ import asyncio
 import datetime
 import urllib.request, urllib.error
 import json
+from faker import Faker
 
 
 client = discord.Client() # 接続に使用するオブジェクト
+fake = Faker("ja_jp")
 
 # 起動時に通知してくれる処理
 @client.event
@@ -18,6 +20,7 @@ async def on_ready():
 async def on_message(message):
     if message.content.startswith('/neko'):
         reply = 'にゃーん'
+        #reply = fake.sentence()
         await client.send_message(message.channel, reply)
 
     elif message.content.startswith('/1'):
@@ -123,8 +126,9 @@ async def my_background_task():
                 x = ", ".join(res)
                 m = "今日のチェックする放送は" + x
             await client.send_message(channel, m)
-        elif t.hour%4==0 and t.minute<0:
-            a="定期更新"
+        elif t.hour%8==0 and t.minute<15:
+            #a="定期更新"
+            a=fake.sentence()
             await client.send_message(channel, a)
         #else:
         #    a="10分更新"
