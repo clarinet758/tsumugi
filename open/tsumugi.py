@@ -5,6 +5,7 @@ import datetime
 import urllib.request, urllib.error
 import json
 from faker import Faker
+from pymongo import MongoClient
 
 
 client = discord.Client() # 接続に使用するオブジェクト
@@ -18,22 +19,91 @@ async def on_ready():
 # 「/neko」と発言したら「にゃーん」が返る処理
 @client.event
 async def on_message(message):
-    if message.content.startswith('/neko'):
+    own = str(message.author)
+    if client.user.id in message.content and settings.ori==own: # 話しかけられたかの判定
+        #reply = message.content.replace(settings.bot,"")
+        reply = 'このあといいことあるよ！！いぇい！！'
+        await client.send_message(message.channel, reply)
+    elif message.content.startswith('/neko'):
         reply = 'にゃーん'
-        #reply = fake.sentence()
         await client.send_message(message.channel, reply)
 
     elif message.content.startswith('/1'):
-        for i in range(5):
-            w = Weather(0,i)
-            reply = w.run()
-            await client.send_message(message.channel, reply)
+        l = chk(1)
+        if len(l) == 0:
+            await client.send_message(message.channel, "月曜日のチェックする放送はありません。")
+        else:
+            for i in l:
+                l[i]["h"]=str(int(l[i]["h"]))
+                l[i]["m"]=str(int(l[i]["m"]))
+                m="月曜日の{0:}時{1:}分に{2:}です。".format(l[i]["h"],l[i]["m"],l[i]["title"])
+                await client.send_message(message.channel, m)
 
     elif message.content.startswith('/2'):
-        for i in range(5):
-            w = Weather(1,i)
-            reply = w.run()
-            await client.send_message(message.channel, reply)
+        l = chk(2)
+        if len(l) == 0:
+            await client.send_message(message.channel, "火曜日のチェックする放送はありません。")
+        else:
+            for i in l:
+                l[i]["h"]=str(int(l[i]["h"]))
+                l[i]["m"]=str(int(l[i]["m"]))
+                m="火曜日の{0:}時{1:}分に{2:}です。".format(l[i]["h"],l[i]["m"],l[i]["title"])
+                await client.send_message(message.channel, m)
+
+    elif message.content.startswith('/3'):
+        l = chk(3)
+        if len(l) == 0:
+            await client.send_message(message.channel, "水曜日のチェックする放送はありません。")
+        else:
+            for i in l:
+                l[i]["h"]=str(int(l[i]["h"]))
+                l[i]["m"]=str(int(l[i]["m"]))
+                m="水曜日の{0:}時{1:}分に{2:}です。".format(l[i]["h"],l[i]["m"],l[i]["title"])
+                await client.send_message(message.channel, m)
+
+    elif message.content.startswith('/4'):
+        l = chk(4)
+        if len(l) == 0:
+            await client.send_message(message.channel, "木曜日のチェックする放送はありません。")
+        else:
+            for i in l:
+                l[i]["h"]=str(int(l[i]["h"]))
+                l[i]["m"]=str(int(l[i]["m"]))
+                m="木曜日の{0:}時{1:}分に{2:}です。".format(l[i]["h"],l[i]["m"],l[i]["title"])
+                await client.send_message(message.channel, m)
+
+    elif message.content.startswith('/5'):
+        l = chk(5)
+        if len(l) == 0:
+            await client.send_message(message.channel, "金曜日のチェックする放送はありません。")
+        else:
+            for i in l:
+                l[i]["h"]=str(int(l[i]["h"]))
+                l[i]["m"]=str(int(l[i]["m"]))
+                m="金曜日の{0:}時{1:}分に{2:}です。".format(l[i]["h"],l[i]["m"],l[i]["title"])
+                await client.send_message(message.channel, m)
+
+    elif message.content.startswith('/6'):
+        l = chk(6)
+        if len(l) == 0:
+            await client.send_message(message.channel, "土曜日のチェックする放送はありません。")
+        else:
+            for i in l:
+                l[i]["h"]=str(int(l[i]["h"]))
+                l[i]["m"]=str(int(l[i]["m"]))
+                m="土曜日の{0:}時{1:}分に{2:}です。".format(l[i]["h"],l[i]["m"],l[i]["title"])
+                await client.send_message(message.channel, m)
+
+    elif message.content.startswith('/7'):
+        l = chk(7)
+        if len(l) == 0:
+            await client.send_message(message.channel, "日曜日のチェックする放送はありません。")
+        else:
+            for i in l:
+                l[i]["h"]=str(int(l[i]["h"]))
+                l[i]["m"]=str(int(l[i]["m"]))
+                m="日曜日の{0:}時{1:}分に{2:}です。".format(l[i]["h"],l[i]["m"],l[i]["title"])
+                await client.send_message(message.channel, m)
 
     elif message.content.startswith('/8'):
         t = metro()
@@ -44,6 +114,18 @@ async def on_message(message):
             reply = tmp.format("東西",t[0],t[1],t[2])
         await client.send_message(message.channel, reply)
             
+    elif message.content.startswith('/9'):
+        for i in range(5):
+            w = Weather(0,i)
+            reply = w.run()
+            await client.send_message(message.channel, reply)
+
+    elif message.content.startswith('/0'):
+        for i in range(5):
+            w = Weather(1,i)
+            reply = w.run()
+            await client.send_message(message.channel, reply)
+
 
 def metro():
     ans=[]
@@ -61,6 +143,43 @@ def metro():
             ans.append(i["odpt:trainInformationText"])
             return ans
     return ("error",)
+
+def jg(j):
+    moc=settings.moc
+    mot=settings.mot
+    try:
+        e=[]
+        i=j.read()
+        x = json.loads(i)
+        if len(x)!=5: e[5]=5
+        if len(x['title'])==0: e[5]=5
+        if 0<=int(x['w'])<7: e[5]=5
+        if 0<=int(x['h'])<24: e[5]=5
+        if 0<=int(x['m'])<60: e[5]=5
+        if 0<=int(x['p'])<2: e[5]=5
+        client = MongoClient(moc,mot)
+        db = client["anime"]
+        db.authenticate(settings.mou,settings.mop)
+        k = db.anime.find({'title':x['title']})
+        for i in k:
+            if i['title']==x['title'] and i['w']==x['w'] and i['h']==x['h'] and i['m']==x['m'] and i['p']==x['p']:
+                return "登録しました。"
+        return "登録に失敗したかもしれません。" 
+    except:
+        return "不正なフォーマットの可能性があるため登録を実行しません。。。"
+
+def chk(i):
+    moc=settings.moc
+    mot=settings.mot
+    d={}
+    client = MongoClient(moc,mot)
+    db = client["anime"]
+    db.authenticate(settings.mou,settings.mop)
+    k = db.anime.find({"w":i-1})
+    for a,i in enumerate(k):
+        d[a]=i
+    return d        
+
     
 
 class Weather:
