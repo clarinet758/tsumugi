@@ -178,7 +178,52 @@ def chk(i):
     k = db.anime.find({"w":i-1})
     for a,i in enumerate(k):
         d[a]=i
-    return d        
+    return d
+
+def find(j):
+    moc=settings.moc
+    mot=settings.mot
+    client = MongoClient(moc,mot)
+    db = client["misskey"]
+    db.authenticate(settings.mou,settings.mop)
+    return db.clarinet.find(j)
+
+def misskey_log():
+    url = "https://misskey.xyz/api/notes/create"
+    method = "POST"
+    headers = {"Content-Type" : "application/json"}
+    target = find({"target":"target"})
+    log    = find({"targetNo":target["targetNo"]})
+    
+
+    b=["username", "description", "followingCount", "followersCount", "notesCount" ]
+    m=[]
+    for i in b:
+        if i in log:
+           tmp=l[i]
+           if type(tmp) == float: tmp=str(int(tmp))
+           m.append(tmp)
+        else:
+           m.append("Error")
+
+    url = "https://misskey.xyz/api/i"
+
+    obj={"i":settings.key}
+    
+    #p="保存されていたデータのfollowing数は{0:}、follower数は{1:}、投稿件数は{2:}です。".format(m[0],m[1],m[2])
+    #p="今日のチェックはのfollowing数は{0:}、follower数は{1:}、投稿件数は{2:}です。".format(m[2],m[3],m[4])
+
+
+    json_data = json.dumps(obj).encode("utf-8")
+
+    # httpリクエストを準備してPOST
+    request = urllib.request.Request(url, data=json_data, method=method, headers=headers)
+    with urllib.request.urlopen(request) as response:
+        res = response.read().decode("utf-8")
+    print(m)
+    print(res)
+
+
 
     
 
