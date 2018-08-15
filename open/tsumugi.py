@@ -7,7 +7,8 @@ import json
 from faker import Faker
 from pymongo import MongoClient
 
-
+q   = '0000'
+que = 0
 client = discord.Client() # 接続に使用するオブジェクト
 fake = Faker("ja_jp")
 
@@ -20,6 +21,8 @@ async def on_ready():
 @client.event
 async def on_message(message):
     own = str(message.author)
+    global que
+    global q
     if client.user.id in message.content and settings.ori==own: # 話しかけられたかの判定
         #reply = message.content.replace(settings.bot,"")
         reply = 'このあといいことあるよ！！いぇい！！'
@@ -126,6 +129,42 @@ async def on_message(message):
             reply = w.run()
             await client.send_message(message.channel, reply)
 
+    elif message.content.startswith('/d'):
+        await client.send_message(message.channel, q)
+
+    elif message.content.startswith('/r'):
+        q=gen()
+        #global que
+        que=0
+        await client.send_message(message.channel, q)
+
+    elif message.content.startswith('/q'):
+        #global que
+        que+=1
+        c=message.content.replace('/q ','')
+        bulls=cows=0
+        bc=[]
+        if c==q:
+            mess = str(que) + " done"
+            q=gen()
+            await client.send_message(message.channel, mess)
+        else:
+            for i in range(4):
+                if c[i]==q[i]:
+                    bulls+=1
+                    bc.append(i)
+            for i in range(4):
+                for j in range(4):
+                    if i!=j and j not in bc and i not in bc and c[i]==q[j]:
+                        cows += 1
+                        bc.append(j)
+            mess=str(bulls)+" "+str(cows)
+            await client.send_message(message.channel, mess)
+            
+      
+        #await client.send_message(message.channel, c)
+    #if client.user.id in message.content and settings.ori==own: # 話しかけられたかの判定
+        #reply = message.content.replace(settings.bot,"")
 
 def metro():
     ans=[]
@@ -168,6 +207,14 @@ def jg(j):
     except:
         return "不正なフォーマットの可能性があるため登録を実行しません。。。"
 
+def gen():
+    seed = '0123456789'
+    ret  = ''
+    for i in range(4):
+        o = datetime.datetime.now()
+        ret += str(seed[o.microsecond%10])
+    return ret
+
 def chk(i):
     moc=settings.moc
     mot=settings.mot
@@ -178,52 +225,7 @@ def chk(i):
     k = db.anime.find({"w":i-1})
     for a,i in enumerate(k):
         d[a]=i
-    return d
-
-def find(j):
-    moc=settings.moc
-    mot=settings.mot
-    client = MongoClient(moc,mot)
-    db = client["misskey"]
-    db.authenticate(settings.mou,settings.mop)
-    return db.clarinet.find(j)
-
-def misskey_log():
-    url = "https://misskey.xyz/api/notes/create"
-    method = "POST"
-    headers = {"Content-Type" : "application/json"}
-    target = find({"target":"target"})
-    log    = find({"targetNo":target["targetNo"]})
-    
-
-    b=["username", "description", "followingCount", "followersCount", "notesCount" ]
-    m=[]
-    for i in b:
-        if i in log:
-           tmp=l[i]
-           if type(tmp) == float: tmp=str(int(tmp))
-           m.append(tmp)
-        else:
-           m.append("Error")
-
-    url = "https://misskey.xyz/api/i"
-
-    obj={"i":settings.key}
-    
-    #p="保存されていたデータのfollowing数は{0:}、follower数は{1:}、投稿件数は{2:}です。".format(m[0],m[1],m[2])
-    #p="今日のチェックはのfollowing数は{0:}、follower数は{1:}、投稿件数は{2:}です。".format(m[2],m[3],m[4])
-
-
-    json_data = json.dumps(obj).encode("utf-8")
-
-    # httpリクエストを準備してPOST
-    request = urllib.request.Request(url, data=json_data, method=method, headers=headers)
-    with urllib.request.urlopen(request) as response:
-        res = response.read().decode("utf-8")
-    print(m)
-    print(res)
-
-
+    return d        
 
     
 
